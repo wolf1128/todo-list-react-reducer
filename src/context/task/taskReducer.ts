@@ -1,4 +1,11 @@
-import { ADD_TASK, REMOVE_TASK, UPDATE_TASK_STATUS, UPDATE_TASK_TITLE } from '../types';
+import {
+	ADD_TASK,
+	CHANGE_TAB,
+	REMOVE_TASK,
+	UPDATE_FILTERED_TASKS,
+	UPDATE_TASK_STATUS,
+	UPDATE_TASK_TITLE,
+} from '../types';
 
 type State = {
 	task?: {
@@ -7,6 +14,11 @@ type State = {
 		isFinished: boolean;
 	};
 	tasks?: {
+		id: number;
+		title: string;
+		isFinished: boolean;
+	}[];
+	filteredTasks?: {
 		id: number;
 		title: string;
 		isFinished: boolean;
@@ -25,10 +37,17 @@ interface Payload {
 		title: string;
 		isFinished: boolean;
 	}[];
+	filteredTasks: {
+		id: number;
+		title: string;
+		isFinished: boolean;
+	}[];
 	selectedTab: number;
 }
 interface Action {
 	type:
+		| 'CHANGE_TAB'
+		| 'UPDATE_FILTERED_TASKS'
 		| 'ADD_TASK'
 		| 'ADD_TASK'
 		| 'REMOVE_TASK'
@@ -40,6 +59,17 @@ interface Action {
 
 const taskReducer = (state: State, action: Action) => {
 	switch (action.type) {
+		case CHANGE_TAB:
+			return {
+				...state,
+				selectedTab: action.payload.selectedTab,
+			};
+		case UPDATE_FILTERED_TASKS:
+			return {
+				...state,
+				filteredTasks: action.payload.filteredTasks,
+			};
+
 		case ADD_TASK:
 			return {
 				...state,

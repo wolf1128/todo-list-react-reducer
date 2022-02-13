@@ -1,9 +1,18 @@
-import { useReducer } from 'react';
-import { ADD_TASK, REMOVE_TASK, UPDATE_TASK_STATUS, UPDATE_TASK_TITLE } from '../types';
+import React, { useReducer } from 'react';
+import {
+	ADD_TASK,
+	CHANGE_TAB,
+	REMOVE_TASK,
+	UPDATE_FILTERED_TASKS,
+	UPDATE_TASK_STATUS,
+	UPDATE_TASK_TITLE,
+} from '../types';
 import TaskContext from './taskContext';
 import TaskReducer from './taskReducer';
 
 export const initialState = {
+	selectedTab: 0,
+	changeTab: (tabIndex: number) => {},
 	tasks: [
 		{
 			id: Number((new Date().getTime() * Math.random() * 10).toFixed(0)),
@@ -26,16 +35,44 @@ export const initialState = {
 			isFinished: false,
 		},
 	],
-	selectedTab: 0,
+	filteredTasks: [
+		{
+			id: Number((new Date().getTime() * Math.random() * 10).toFixed(0)),
+			title: 'Finish the javascript course',
+			isFinished: false,
+		},
+		{
+			id: Number((new Date().getTime() * Math.random() * 10).toFixed(0)),
+			title: 'Finish the python course',
+			isFinished: false,
+		},
+		{
+			id: Number((new Date().getTime() * Math.random() * 10).toFixed(0)),
+			title: 'Finish the React.js course',
+			isFinished: false,
+		},
+		{
+			id: Number((new Date().getTime() * Math.random() * 10).toFixed(0)),
+			title: 'Finish the styled-components course',
+			isFinished: false,
+		},
+	],
 	addTask: (title: string) => {},
 	removeTask: (taskId: number) => {},
 	updateTaskTitle: (taskId: number, updatedTitle: string) => {},
-	updateTaskStatus: (taskId: number) => {}
+	updateTaskStatus: (taskId: number) => {},
 };
 
 const TaskState = (props: { children: any }) => {
-	const [state, dispatch] = useReducer(TaskReducer, initialState); // Note
+	// Note
 	// React doesn’t use the state = initialState argument convention popularized by Redux. The initial value sometimes needs to depend on props and so is specified from the Hook call instead. If you feel strongly about this, you can call useReducer(reducer, undefined, reducer) to emulate the Redux behavior, but it’s not encouraged.
+	const [state, dispatch] = useReducer(TaskReducer, initialState);
+
+	const changeTab = (tabIndex: number) => {
+		const payload = { selectedTab: tabIndex };
+
+		dispatch({ type: CHANGE_TAB, payload: payload });
+	};
 
 	const addTask = (title: string) => {
 		const payload = {
@@ -90,15 +127,46 @@ const TaskState = (props: { children: any }) => {
 		dispatch({ type: UPDATE_TASK_STATUS, payload: payload });
 	};
 
+	const updateFilteredTasks = (updatedTasks: typeof initialState.filteredTasks) => {
+		const payload = {
+			filteredTasks: updatedTasks
+		}
+
+		dispatch({ type: UPDATE_FILTERED_TASKS, payload });
+	}
+
+	React.useEffect(() => {
+		// NOTE: We always want fresh data for filtered ones.
+		// NOTE: Don't call Hooks inside loops, conditions, or nested functions.
+		//  Instead, always use Hooks at the top level of your React function, before any early returns.
+		//  By following this rule, you ensure that Hooks are called in the same order each time a component renders.
+		switch (state.selectedTab) {
+			case 0:
+				updateFilteredTasks(state.tasks!);
+				break;
+			case 1:
+				updateFilteredTasks(state.tasks!.filter((task) => task.isFinished === true));
+				break;
+			case 2:
+				updateFilteredTasks(state.tasks!.filter((task) => task.isFinished !== true));
+				break;
+			default:
+				updateFilteredTasks(state.tasks!);
+				break;
+		}
+	}, [state.tasks, state.selectedTab]);
+
 	return (
 		<TaskContext.Provider
 			value={{
-				tasks: state.tasks!,
+				changeTab,
 				selectedTab: state.selectedTab!,
+				filteredTasks: state.filteredTasks!,
+				tasks: state.tasks!,
 				addTask,
 				removeTask,
 				updateTaskTitle,
-				updateTaskStatus
+				updateTaskStatus,
 			}}
 		>
 			{props.children}

@@ -31,27 +31,6 @@ function App() {
 	const [filteredTasks, setFilteredTasks] = useState<typeof tasks>([]);
 	const [selectedTab, setSelectedTab] = React.useState(0);
 
-	React.useEffect(() => {
-		// NOTE: We always want fresh data for filtered ones.
-		// NOTE: Don't call Hooks inside loops, conditions, or nested functions.
-		//  Instead, always use Hooks at the top level of your React function, before any early returns.
-		//  By following this rule, you ensure that Hooks are called in the same order each time a component renders.
-		switch (selectedTab) {
-			case 0:
-				setFilteredTasks(tasks);
-				break;
-			case 1:
-				setFilteredTasks(tasks.filter((task) => task.isFinished === true));
-				break;
-			case 2:
-				setFilteredTasks(tasks.filter((task) => task.isFinished !== true));
-				break;
-			default:
-				setFilteredTasks(tasks);
-				break;
-		}
-	}, [tasks, selectedTab]);
-
 	const searchTasksHandler = (title: string) => {
 		setFilteredTasks(
 			tasks.filter((task) => {
@@ -79,8 +58,6 @@ function App() {
 			<div className="container">
 				<TaskForm />
 				<TasksCard
-					currentTab={selectedTab}
-					onUpdateSelectedTab={setSelectedTab}
 					onSearchTasks={searchTasksHandler}
 				/>
 			</div>

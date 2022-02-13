@@ -5,7 +5,7 @@ import styles from './TasksCardList.module.css';
 
 const TasksCardList = () => {
 	const taskContext = useContext(TaskContext);
-	const { tasks, removeTask, updateTaskTitle, updateTaskStatus } = taskContext;
+	const { filteredTasks, removeTask, updateTaskTitle, updateTaskStatus } = taskContext;
 
 	const [updatedTask, setUpdatedTask] = React.useState('');
 	const [showUpdateInput, setShowUpdateInput] = React.useState(false);
@@ -26,7 +26,7 @@ const TasksCardList = () => {
 
 	return (
 		<ul className={styles.TasksList}>
-			{tasks.map((item, index) => {
+			{filteredTasks.map((item, index) => {
 				return (
 					<div key={index}>
 						{/* React tracks the elements in the list in the child element. */}
