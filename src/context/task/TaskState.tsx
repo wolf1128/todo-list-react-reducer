@@ -3,6 +3,7 @@ import {
 	ADD_TASK,
 	CHANGE_TAB,
 	REMOVE_TASK,
+	SEARCH_TASKS,
 	UPDATE_FILTERED_TASKS,
 	UPDATE_TASK_STATUS,
 	UPDATE_TASK_TITLE,
@@ -61,6 +62,7 @@ export const initialState = {
 	removeTask: (taskId: number) => {},
 	updateTaskTitle: (taskId: number, updatedTitle: string) => {},
 	updateTaskStatus: (taskId: number) => {},
+	searchTasks: (title: string) => {},
 };
 
 const TaskState = (props: { children: any }) => {
@@ -127,13 +129,15 @@ const TaskState = (props: { children: any }) => {
 		dispatch({ type: UPDATE_TASK_STATUS, payload: payload });
 	};
 
-	const updateFilteredTasks = (updatedTasks: typeof initialState.filteredTasks) => {
+	const updateFilteredTasks = (
+		updatedTasks: typeof initialState.filteredTasks
+	) => {
 		const payload = {
-			filteredTasks: updatedTasks
-		}
+			filteredTasks: updatedTasks,
+		};
 
 		dispatch({ type: UPDATE_FILTERED_TASKS, payload });
-	}
+	};
 
 	React.useEffect(() => {
 		// NOTE: We always want fresh data for filtered ones.
@@ -145,16 +149,46 @@ const TaskState = (props: { children: any }) => {
 				updateFilteredTasks(state.tasks!);
 				break;
 			case 1:
-				updateFilteredTasks(state.tasks!.filter((task) => task.isFinished === true));
+				updateFilteredTasks(
+					state.tasks!.filter((task) => task.isFinished === true)
+				);
 				break;
 			case 2:
-				updateFilteredTasks(state.tasks!.filter((task) => task.isFinished !== true));
+				updateFilteredTasks(
+					state.tasks!.filter((task) => task.isFinished !== true)
+				);
 				break;
 			default:
 				updateFilteredTasks(state.tasks!);
 				break;
 		}
 	}, [state.tasks, state.selectedTab]);
+
+	const searchTasks = (title: string) => {
+		const payload = {
+			filteredTasks: state.tasks!.filter((task) => {
+				if (title.length > 0) {
+					if (state.selectedTab === 0) {
+						return task.title.toLowerCase().match(title); // task status doesn't matter here.
+					} else {
+						const taskStatus = state.selectedTab === 1 ? true : false;
+
+						return (
+							task.title.toLowerCase().match(title) &&
+							task.isFinished === taskStatus
+						);
+					}
+				}
+
+				// Ensure we are at the first tab:
+				changeTab(0);
+
+				return task;
+			}),
+		};
+
+		dispatch({ type: SEARCH_TASKS, payload });
+	};
 
 	return (
 		<TaskContext.Provider
@@ -167,6 +201,7 @@ const TaskState = (props: { children: any }) => {
 				removeTask,
 				updateTaskTitle,
 				updateTaskStatus,
+				searchTasks
 			}}
 		>
 			{props.children}

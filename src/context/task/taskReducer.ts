@@ -2,6 +2,7 @@ import {
 	ADD_TASK,
 	CHANGE_TAB,
 	REMOVE_TASK,
+	SEARCH_TASKS,
 	UPDATE_FILTERED_TASKS,
 	UPDATE_TASK_STATUS,
 	UPDATE_TASK_TITLE,
@@ -53,23 +54,12 @@ interface Action {
 		| 'REMOVE_TASK'
 		| 'UPDATE_TASK_TITLE'
 		| 'UPDATE_TASK_STATUS'
-		| 'SEARCH_TASK';
+		| 'SEARCH_TASKS';
 	payload: Partial<Payload>;
 }
 
 const taskReducer = (state: State, action: Action) => {
 	switch (action.type) {
-		case CHANGE_TAB:
-			return {
-				...state,
-				selectedTab: action.payload.selectedTab,
-			};
-		case UPDATE_FILTERED_TASKS:
-			return {
-				...state,
-				filteredTasks: action.payload.filteredTasks,
-			};
-
 		case ADD_TASK:
 			return {
 				...state,
@@ -92,7 +82,21 @@ const taskReducer = (state: State, action: Action) => {
 				...state,
 				tasks: action.payload.tasks,
 			};
-
+		case CHANGE_TAB:
+			return {
+				...state,
+				selectedTab: action.payload.selectedTab,
+			};
+		case UPDATE_FILTERED_TASKS:
+			return {
+				...state,
+				filteredTasks: action.payload.filteredTasks,
+			};
+		case SEARCH_TASKS:
+			return {
+				...state,
+				filteredTasks: action.payload.filteredTasks,
+			};
 		default:
 			return state;
 	}
