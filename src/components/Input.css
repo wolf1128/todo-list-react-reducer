@@ -1,0 +1,17 @@
+input[type='text'] {
+	width: 60%;
+	max-width: 100%;
+	padding: 12px 20px;
+	margin: 8px 0;
+	transition: width 0.4s ease-in-out;
+	border-radius: 15px;
+}
+
+input[type='text']:focus {
+	width: 100%;
+}
+
+.inputArea {
+	display: flex;
+	flex-direction: column;
+}
